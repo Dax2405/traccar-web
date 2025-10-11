@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 
 export default (t) => useMemo(() => ({
+  language: {
+    name: t('loginLanguage'),
+    type: 'string',
+  },
   mapGeofences: {
     name: t('attributeShowGeofences'),
     type: 'boolean',
@@ -125,6 +129,14 @@ export default (t) => useMemo(() => ({
     name: t('attributeWebLiveRouteLength'),
     type: 'number',
   },
+  mapLineWidth: {
+    name: t('attributeMapLineWidth'),
+    type: 'number',
+  },
+  mapLineOpacity: {
+    name: t('attributeMapLineOpacity'),
+    type: 'number',
+  },
   'web.selectZoom': {
     name: t('attributeWebSelectZoom'),
     type: 'number',
@@ -136,5 +148,13 @@ export default (t) => useMemo(() => ({
   iconScale: {
     name: t('sharedIconScale'),
     type: 'number',
+  },
+  navigationAppLink: {
+    name: t('attributeNavigationAppLink'),
+    type: 'string',
+  },
+  navigationAppTitle: {
+    name: t('attributeNavigationAppTitle'),
+    type: 'string',
   },
 }), [t]);

@@ -24,4 +24,7 @@ export default (server, darkMode) => ({
   geometry: {
     main: "#3bb2d0",
   },
+  alwaysDark: {
+    main: grey[900],
+  }
 });

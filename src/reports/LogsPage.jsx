@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Table, TableRow, TableCell, TableHead, TableBody, IconButton, Tooltip,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from 'tss-react/mui';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -12,21 +12,15 @@ import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
 import { sessionActions } from '../store';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles()((theme) => ({
   columnAction: {
     width: '1%',
     paddingLeft: theme.spacing(1),
   },
-  success: {
-    color: theme.palette.success.main,
-  },
-  error: {
-    color: theme.palette.error.main,
-  },
 }));
 
 const LogsPage = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -44,7 +38,7 @@ const LogsPage = () => {
   };
 
   return (
-    <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'statisticsTitle']}>
+    <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'sharedLogs']}>
       <Table>
         <TableHead>
           <TableRow>
@@ -55,17 +49,17 @@ const LogsPage = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {items.map((item, index) => /* eslint-disable react/no-array-index-key */ (
+          {items.map((item, index) => (
             <TableRow key={index}>
               <TableCell className={classes.columnAction} padding="none">
                 {item.deviceId ? (
-                  <IconButton size="small" disabled>
-                    <CheckCircleOutlineIcon fontSize="small" className={classes.success} />
+                  <IconButton color="success" size="small" disabled>
+                    <CheckCircleOutlineIcon fontSize="small" />
                   </IconButton>
                 ) : (
                   <Tooltip title={t('loginRegister')}>
-                    <IconButton size="small" onClick={() => registerDevice(item.uniqueId)}>
-                      <HelpOutlineIcon fontSize="small" className={classes.error} />
+                    <IconButton color="error" size="small" onClick={() => registerDevice(item.uniqueId)}>
+                      <HelpOutlineIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 )}

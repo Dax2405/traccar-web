@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import {
   Accordion,
@@ -9,6 +9,7 @@ import {
   Checkbox,
   FormGroup,
   Button,
+  TextField,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTranslation, useTranslationKeys } from '../common/components/LocalizationProvider';
@@ -18,9 +19,10 @@ import SelectField from '../common/components/SelectField';
 import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
 import useSettingsStyles from './common/useSettingsStyles';
+import fetchOrThrow from '../common/util/fetchOrThrow';
 
 const NotificationPage = () => {
-  const classes = useSettingsStyles();
+  const { classes } = useSettingsStyles();
   const t = useTranslation();
 
   const [item, setItem] = useState();
@@ -32,14 +34,11 @@ const NotificationPage = () => {
 
   const testNotificators = useCatch(async () => {
     await Promise.all(item.notificators.split(/[, ]+/).map(async (notificator) => {
-      const response = await fetch(`/api/notifications/test/${notificator}`, {
+      await fetchOrThrow(`/api/notifications/test/${notificator}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(item),
       });
-      if (!response.ok) {
-        throw Error(await response.text());
-      }
     }));
   });
 
@@ -93,7 +92,7 @@ const NotificationPage = () => {
               {item.notificators?.includes('command') && (
                 <SelectField
                   value={item.commandId}
-                  onChange={(event) => setItem({ ...item, commandId: Number(event.target.value) })}
+                  onChange={(e) => setItem({ ...item, commandId: Number(e.target.value) })}
                   endpoint="/api/commands"
                   titleGetter={(it) => it.description}
                   label={t('sharedSavedCommand')}
@@ -112,9 +111,9 @@ const NotificationPage = () => {
                   control={(
                     <Checkbox
                       checked={item.always}
-                      onChange={(event) => setItem({ ...item, always: event.target.checked })}
+                      onChange={(e) => setItem({ ...item, always: e.target.checked })}
                     />
-                    )}
+                  )}
                   label={t('notificationAlways')}
                 />
               </FormGroup>
@@ -127,12 +126,28 @@ const NotificationPage = () => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
+              <TextField
+                value={item.description || ''}
+                onChange={(e) => setItem({ ...item, description: e.target.value })}
+                label={t('sharedDescription')}
+              />
               <SelectField
                 value={item.calendarId}
-                onChange={(event) => setItem({ ...item, calendarId: Number(event.target.value) })}
+                onChange={(e) => setItem({ ...item, calendarId: Number(e.target.value) })}
                 endpoint="/api/calendars"
                 label={t('sharedCalendar')}
               />
+              <FormGroup>
+                <FormControlLabel
+                  control={(
+                    <Checkbox
+                      checked={item.attributes && item.attributes.priority}
+                      onChange={(e) => setItem({ ...item, attributes: { ...item.attributes, priority: e.target.checked } })}
+                    />
+                  )}
+                  label={t('sharedPriority')}
+                />
+              </FormGroup>
             </AccordionDetails>
           </Accordion>
         </>

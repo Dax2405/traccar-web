@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Table, TableRow, TableCell, TableHead, TableBody,
 } from '@mui/material';
@@ -13,9 +13,10 @@ import CollectionActions from './components/CollectionActions';
 import TableShimmer from '../common/components/TableShimmer';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import useSettingsStyles from './common/useSettingsStyles';
+import fetchOrThrow from '../common/util/fetchOrThrow';
 
 const NotificationsPage = () => {
-  const classes = useSettingsStyles();
+  const { classes } = useSettingsStyles();
   const t = useTranslation();
 
   const [timestamp, setTimestamp] = useState(Date.now());
@@ -26,12 +27,8 @@ const NotificationsPage = () => {
   useEffectAsync(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/notifications');
-      if (response.ok) {
-        setItems(await response.json());
-      } else {
-        throw Error(await response.text());
-      }
+      const response = await fetchOrThrow('/api/notifications');
+      setItems(await response.json());
     } finally {
       setLoading(false);
     }
@@ -54,6 +51,7 @@ const NotificationsPage = () => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell>{t('sharedDescription')}</TableCell>
             <TableCell>{t('notificationType')}</TableCell>
             <TableCell>{t('notificationAlways')}</TableCell>
             <TableCell>{t('sharedAlarms')}</TableCell>
@@ -64,6 +62,7 @@ const NotificationsPage = () => {
         <TableBody>
           {!loading ? items.filter(filterByKeyword(searchKeyword)).map((item) => (
             <TableRow key={item.id}>
+              <TableCell>{item.description}</TableCell>
               <TableCell>{t(prefixString('event', item.type))}</TableCell>
               <TableCell>{formatBoolean(item.always, t)}</TableCell>
               <TableCell>{formatList('alarm', item.attributes.alarms)}</TableCell>

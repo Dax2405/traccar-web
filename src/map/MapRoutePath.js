@@ -1,8 +1,9 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useId, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { map } from './core/MapView';
-import { getSpeedColor } from '../common/util/colors';
+import getSpeedColor from '../common/util/colors';
+import { useAttributePreference } from '../common/util/preferences';
 
 const MapRoutePath = ({ positions }) => {
   const id = useId();
@@ -22,6 +23,9 @@ const MapRoutePath = ({ positions }) => {
     }
     return null;
   });
+
+  const mapLineWidth = useAttributePreference('mapLineWidth', 2);
+  const mapLineOpacity = useAttributePreference('mapLineOpacity', 1);
 
   useEffect(() => {
     map.addSource(id, {
@@ -44,14 +48,12 @@ const MapRoutePath = ({ positions }) => {
       },
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 2,
+        'line-width': ['get', 'width'],
+        'line-opacity': ['get', 'opacity'],
       },
     });
 
     return () => {
-      if (map.getLayer(`${id}-title`)) {
-        map.removeLayer(`${id}-title`);
-      }
       if (map.getLayer(`${id}-line`)) {
         map.removeLayer(`${id}-line`);
       }
@@ -62,7 +64,8 @@ const MapRoutePath = ({ positions }) => {
   }, []);
 
   useEffect(() => {
-    const maxSpeed = positions.map((item) => item.speed).reduce((a, b) => Math.max(a, b), -Infinity);
+    const minSpeed = positions.map((p) => p.speed).reduce((a, b) => Math.min(a, b), Infinity);
+    const maxSpeed = positions.map((p) => p.speed).reduce((a, b) => Math.max(a, b), -Infinity);
     const features = [];
     for (let i = 0; i < positions.length - 1; i += 1) {
       features.push({
@@ -73,12 +76,12 @@ const MapRoutePath = ({ positions }) => {
         },
         properties: {
           color: reportColor || getSpeedColor(
-            theme.palette.success.main,
-            theme.palette.warning.main,
-            theme.palette.error.main,
             positions[i + 1].speed,
+            minSpeed,
             maxSpeed,
           ),
+          width: mapLineWidth,
+          opacity: mapLineOpacity,
         },
       });
     }
@@ -86,7 +89,7 @@ const MapRoutePath = ({ positions }) => {
       type: 'FeatureCollection',
       features,
     });
-  }, [theme, positions, reportColor]);
+  }, [theme, positions, reportColor, mapLineWidth, mapLineOpacity]);
 
   return null;
 };

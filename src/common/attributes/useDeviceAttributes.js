@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 
 export default (t) => useMemo(() => ({
+  'command.sender': {
+    name: t('deviceCommandSender'),
+    type: 'string',
+  },
   'web.reportColor': {
     name: t('attributeWebReportColor'),
     type: 'string',
@@ -22,12 +26,8 @@ export default (t) => useMemo(() => ({
     name: t('sharedTimezone'),
     type: 'string',
   },
-  deviceInactivityStart: {
-    name: t('attributeDeviceInactivityStart'),
-    type: 'number',
-  },
-  deviceInactivityPeriod: {
-    name: t('attributeDeviceInactivityPeriod'),
-    type: 'number',
+  'forward.url': {
+    name: t('attributeForwardUrl'),
+    type: 'string',
   },
 }), [t]);
